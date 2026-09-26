@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LogicDiskrit - Simulator & Verifikator Logika</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-surface-base font-body text-on-surface antialiased min-h-screen">
+
+  <!-- HEADER NAVBAR -->
+  <header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-surface-border">
+    <div class="h-16 max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-glow">
+          <span class="material-symbols-outlined text-[22px]">neurology</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-headline font-bold text-lg leading-tight tracking-tight text-white">LogicDiskrit</span>
+          <span class="font-mono text-[11px] text-text-muted">Grup G • Diskrit PJBL</span>
+        </div>
+      </div>
+
+      <!-- Main Navigation -->
+      <nav class="hidden md:flex items-center gap-1 bg-surface-container/60 p-1 rounded-xl border border-surface-border">
+        <button onclick="switchTab('simulator')" id="nav-btn-simulator" class="tab-nav-btn active">
+          <span class="material-symbols-outlined text-[18px]">table_chart</span>
+          <span>Simulator Proposisi</span>
+        </button>
+        <button onclick="switchTab('argumen')" id="nav-btn-argumen" class="tab-nav-btn">
+          <span class="material-symbols-outlined text-[18px]">verified</span>
+          <span>Verifikator Argumen</span>
+        </button>
+        <button onclick="switchTab('panduan')" id="nav-btn-panduan" class="tab-nav-btn">
+          <span class="material-symbols-outlined text-[18px]">menu_book</span>
+          <span>Panduan Inferensi</span>
+        </button>
+        <button onclick="switchTab('kelompok')" id="nav-btn-kelompok" class="tab-nav-btn">
+          <span class="material-symbols-outlined text-[18px]">group</span>
+          <span>Tim Pengembang</span>
+        </button>
+      </nav>
+
+      <!-- Engine Status -->
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-elevated border border-surface-border font-mono text-xs text-primary">
+        <span class="w-2 h-2 rounded-full bg-binary-true animate-pulse"></span>
+        <span>Engine Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 flex flex-col gap-8">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: SIMULATOR PROPOSISI                                                -->
+    <!-- ========================================================================= -->
+    <section id="panel-simulator" class="tab-panel flex flex-col gap-6">
+      
+      <!-- Header Section -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-mono bg-primary/10 text-primary border border-primary/20 mb-2">
+            Modul Komputasi 01
+          </div>
+          <h1 class="font-headline text-2xl sm:text-3xl font-bold text-white tracking-tight">Truth Table Simulator &amp; Evaluator</h1>
+          <p class="text-text-secondary text-sm mt-1 max-w-2xl">
+            Evaluasi ekspresi logika proposional dengan kalkulasi tabel kebenaran otomatis $2^n$, analisis klasifikasi semantik, dan ekspor LaTeX/Markdown.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="loadFormulaPreset('(p ∧ q) → r')" class="btn-secondary text-xs">
+            <span class="material-symbols-outlined text-[16px]">restart_alt</span> Contoh
+          </button>
+          <button onclick="clearFormulaInput()" class="btn-danger text-xs">
+            <span class="material-symbols-outlined text-[16px]">clear_all</span> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Input Card -->
+      <div class="glass-card p-5 sm:p-6 flex flex-col gap-5">
+        
+        <!-- Formula Input Bar -->
+        <div class="flex flex-col gap-2">
+          <label for="formula-input" class="text-xs font-mono uppercase tracking-wider text-text-muted flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-primary">function</span>
+              Input Ekspresi Logika:
+            </span>
+            <span id="formula-status" class="text-binary-true font-medium flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span> Sintaks Valid
+            </span>
+          </label>
+
+          <div class="relative flex items-center">
+            <span class="absolute left-4 text-primary font-mono font-bold select-none">f(x):</span>
+            <input type="text" id="formula-input" value="(p ∧ q) → r" placeholder="Ketik ekspresi logika, contoh: (p ∧ q) → r" class="input-field pl-16 pr-28 py-3.5 font-mono text-base" oninput="evaluateSimulatorFormula()" />
+            <div class="absolute right-3 flex items-center gap-1">
+              <button onclick="evaluateSimulatorFormula()" class="btn-primary text-xs py-1.5 px-3">
+                <span>Hitung</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Virtual Keypad -->
+        <div class="flex flex-col gap-2 pt-2 border-t border-surface-border">
+          <span class="text-xs font-mono text-text-muted">Papan Tombol Operator Cepat:</span>
+          <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-2">
+            <button onclick="insertSymbol('p')" class="keypad-btn text-primary">p</button>
+            <button onclick="insertSymbol('q')" class="keypad-btn text-primary">q</button>
+            <button onclick="insertSymbol('r')" class="keypad-btn text-primary">r</button>
+            <button onclick="insertSymbol('s')" class="keypad-btn text-primary">s</button>
+            <button onclick="insertSymbol('¬')" class="keypad-btn text-secondary">¬ <span class="keypad-sub">NOT</span></button>
+            <button onclick="insertSymbol(' ∧ ')" class="keypad-btn text-secondary">∧ <span class="keypad-sub">AND</span></button>
+            <button onclick="insertSymbol(' ∨ ')" class="keypad-btn text-secondary">∨ <span class="keypad-sub">OR</span></button>
+            <button onclick="insertSymbol(' → ')" class="keypad-btn text-secondary">→ <span class="keypad-sub">IMP</span></button>
+            <button onclick="insertSymbol(' ↔ ')" class="keypad-btn text-secondary">↔ <span class="keypad-sub">BIK</span></button>
+            <button onclick="insertSymbol(' ⊕ ')" class="keypad-btn text-secondary">⊕ <span class="keypad-sub">XOR</span></button>
+            <button onclick="insertSymbol('(')" class="keypad-btn text-tertiary">(</button>
+            <button onclick="insertSymbol(')')" class="keypad-btn text-tertiary">)</button>
+          </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="flex flex-wrap items-center gap-2 pt-2 text-xs">
+          <span class="text-text-muted font-mono">Preset:</span>
+          <button onclick="loadFormulaPreset('(p ∧ q) → r')" class="preset-chip">(p ∧ q) → r</button>
+          <button onclick="loadFormulaPreset('¬(p ∧ q) ↔ (¬p ∨ ¬q)')" class="preset-chip">¬(p ∧ q) ↔ (¬p ∨ ¬q)</button>
+          <button onclick="loadFormulaPreset('p ∨ ¬p')" class="preset-chip">p ∨ ¬p [Tautologi]</button>
+          <button onclick="loadFormulaPreset('p ∧ ¬p')" class="preset-chip text-binary-false">p ∧ ¬p [Kontradiksi]</button>
+        </div>
+      </div>
+
+      <!-- Metrics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card p-4 flex flex-col justify-between gap-2">
+          <span class="text-xs font-mono text-text-muted">KLASIFIKASI SEMANTIK</span>
+          <span id="metric-class-badge" class="badge-secondary w-fit text-sm font-bold">KONTINGENSI</span>
+          <p class="text-xs text-text-secondary">Nilai kebenaran tergantung pada kombinasi input.</p>
+        </div>
+
+        <div class="glass-card p-4 flex flex-col justify-between gap-2">
+          <span class="text-xs font-mono text-text-muted">RASIO KEBENARAN</span>
+          <div class="flex items-baseline gap-2">
+            <span id="metric-ratio-text" class="text-xl font-bold text-white">7 / 8</span>
+            <span id="metric-ratio-pct" class="text-xs font-bold text-binary-true">(87.5%)</span>
+          </div>
+          <div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden flex">
+            <div id="ratio-bar-true" class="bg-binary-true h-full" style="width: 87.5%"></div>
+            <div id="ratio-bar-false" class="bg-binary-false h-full" style="width: 12.5%"></div>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 flex flex-col justify-between gap-2">
+          <span class="text-xs font-mono text-text-muted">PROPOSISI ATOMIK</span>
+          <span id="metric-var-count" class="text-xl font-bold text-white">3 Variabel</span>
+          <span id="metric-var-list" class="text-xs font-mono text-tertiary">Simbol: { p, q, r }</span>
+        </div>
+
+        <div class="glass-card p-4 flex flex-col justify-between gap-2">
+          <span class="text-xs font-mono text-text-muted">RUANG STATUS ($2^n$)</span>
+          <span id="metric-matrix-rows" class="text-xl font-bold text-white">8 Baris</span>
+          <span class="text-xs font-mono text-text-muted">Komputasi Eksak Boolean</span>
+        </div>
+      </div>
+
+      <!-- Output Matrix Table -->
+      <div class="glass-card p-5 sm:p-6 flex flex-col gap-4 overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 class="font-headline font-semibold text-white text-lg flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">view_timeline</span>
+            <span>Matriks Kebenaran</span>
+          </h2>
+          <div class="flex items-center gap-2">
+            <button onclick="copyTableMarkdown()" class="btn-secondary text-xs">
+              <span class="material-symbols-outlined text-[16px]">content_paste</span> Markdown
+            </button>
+            <button onclick="copyTableLatex()" class="btn-secondary text-xs">
+              <span class="material-symbols-outlined text-[16px]">code</span> LaTeX
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-surface-border bg-surface-base">
+          <table class="w-full text-left border-collapse" id="truth-table">
+            <thead>
+              <tr class="bg-surface-container text-tertiary font-mono text-xs border-b border-surface-border">
+                <th class="p-3 text-center w-12 text-text-muted">#</th>
+                <th class="p-3 text-center font-bold text-primary">p</th>
+                <th class="p-3 text-center font-bold text-primary">q</th>
+                <th class="p-3 text-center font-bold text-primary">r</th>
+                <th class="p-3 text-center text-text-secondary font-mono">p ∧ q</th>
+                <th class="p-3 text-center font-bold text-white bg-primary/20">(p ∧ q) → r</th>
+              </tr>
+            </thead>
+            <tbody id="truth-table-body" class="font-mono text-sm divide-y divide-surface-border">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: VERIFIKATOR ARGUMEN                                               -->
+    <!-- ========================================================================= -->
+    <section id="panel-argumen" class="tab-panel hidden flex-col gap-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-mono bg-secondary/10 text-secondary border border-secondary/20 mb-2">
+          Modul Komputasi 02
+        </div>
+        <h2 class="font-headline text-2xl font-bold text-white">Verifikator Validitas Argumen Deduktif</h2>
+        <p class="text-text-secondary text-sm mt-1">
+          Uji apakah kumpulan premis menjamin kebenaran konklusi $(P_1 \land P_2 \land \dots \land P_n) \rightarrow K$.
+        </p>
+      </div>
+
+      <div class="glass-card p-5 sm:p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-text-muted uppercase tracking-wider">Daftar Premis &amp; Konklusi:</span>
+          <button onclick="addPremiseInput()" class="btn-secondary text-xs">
+            <span class="material-symbols-outlined text-[16px]">add</span> Tambah Premis
+          </button>
+        </div>
+
+        <div id="premises-container" class="flex flex-col gap-2">
+          <div class="premise-row flex items-center gap-2">
+            <span class="text-xs font-mono text-tertiary w-20 shrink-0">Premis 1 (P₁):</span>
+            <input type="text" value="p → q" class="input-field py-2 text-sm font-mono premise-input" />
+            <button onclick="removePremiseRow(this)" class="p-1 text-text-muted hover:text-binary-false transition-colors">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+          <div class="premise-row flex items-center gap-2">
+            <span class="text-xs font-mono text-tertiary w-20 shrink-0">Premis 2 (P₂):</span>
+            <input type="text" value="p" class="input-field py-2 text-sm font-mono premise-input" />
+            <button onclick="removePremiseRow(this)" class="p-1 text-text-muted hover:text-binary-false transition-colors">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="border-t border-surface-border my-1"></div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono text-primary font-bold w-20 shrink-0">Konklusi (K):</span>
+          <input type="text" id="conclusion-input" value="q" class="input-field py-2 text-sm font-mono font-bold" />
+          <button onclick="verifyArgument()" class="btn-primary py-2 px-4 shrink-0">
+            <span>Verifikasi</span>
+            <span class="material-symbols-outlined text-[18px]">verified</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Result Card -->
+      <div id="argument-result-card" class="glass-card p-5 sm:p-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-headline font-semibold text-white text-base">Hasil Evaluasi Argumen</h3>
+          <span id="arg-status-badge" class="badge-success">VALID</span>
+        </div>
+        <p id="arg-status-explanation" class="text-sm text-text-secondary">
+          Argumen ini <strong>VALID</strong>. Pada semua kondisi di mana seluruh premis BENAR, konklusi juga bernilai BENAR.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: PANDUAN INFERENSI                                                   -->
+    <!-- ========================================================================= -->
+    <section id="panel-panduan" class="tab-panel hidden flex-col gap-6">
+      <div>
+        <h2 class="font-headline text-2xl font-bold text-white">Aturan Inferensi Utama</h2>
+        <p class="text-text-secondary text-sm mt-1">Referensi formal bentuk argumen logis.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="glass-card p-4 flex flex-col gap-2">
+          <span class="font-headline font-bold text-primary text-base">Modus Ponens</span>
+          <p class="text-xs text-text-secondary">Jika $p \rightarrow q$ benar dan $p$ benar, maka $q$ benar.</p>
+          <div class="p-3 rounded-lg bg-surface-container font-mono text-xs text-white">
+            P1: p → q<br/>P2: p<br/>---<br/><strong class="text-binary-true">K: q</strong>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 flex flex-col gap-2">
+          <span class="font-headline font-bold text-primary text-base">Modus Tollens</span>
+          <p class="text-xs text-text-secondary">Jika $p \rightarrow q$ benar dan $q$ salah, maka $p$ salah.</p>
+          <div class="p-3 rounded-lg bg-surface-container font-mono text-xs text-white">
+            P1: p → q<br/>P2: ¬q<br/>---<br/><strong class="text-binary-true">K: ¬p</strong>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 flex flex-col gap-2">
+          <span class="font-headline font-bold text-primary text-base">Silogisme Hipotetis</span>
+          <p class="text-xs text-text-secondary">Rantai kebenaran dari dua bentuk implikasi.</p>
+          <div class="p-3 rounded-lg bg-surface-container font-mono text-xs text-white">
+            P1: p → q<br/>P2: q → r<br/>---<br/><strong class="text-binary-true">K: p → r</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: TIM PENGEMBANG                                                     -->
+    <!-- ========================================================================= -->
+    <section id="panel-kelompok" class="tab-panel hidden flex-col gap-6">
+      <div>
+        <h2 class="font-headline text-2xl font-bold text-white">Tim Pengembang (Grup G)</h2>
+        <p class="text-text-secondary text-sm mt-1">Universitas Bina Bangsa Getsempena</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="glass-card p-4 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center font-bold text-primary text-lg">
+            HF
+          </div>
+          <div class="flex flex-col">
+            <span class="font-headline font-bold text-white">Hasdan Fauji</span>
+            <span class="font-mono text-xs text-text-muted">NIM: 25210060</span>
+            <span class="text-xs text-tertiary">Lead Developer &amp; Logic Engine</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
